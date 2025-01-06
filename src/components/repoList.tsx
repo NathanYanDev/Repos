@@ -1,4 +1,5 @@
 import { MenuIcon, Trash2Icon } from "lucide-react";
+import { Link } from "react-router";
 
 type RepoListProps = {
 	repositories: string[];
@@ -21,9 +22,9 @@ export const RepoList = ({ repositories, handleDelete }: RepoListProps) => {
 								</button>
 								<span className="text-lg font-bold">{repository}</span>
 							</div>
-							<a href="google.com">
+							<Link to={`/repository/${encodeURIComponent(repository)}`}>
 								<MenuIcon />
-							</a>
+							</Link>
 						</li>
 					);
 				})}

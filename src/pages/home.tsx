@@ -4,8 +4,9 @@ import { Github } from "../components/icons/github";
 import { BtnLoading } from "../components/ui/btnLoading";
 import { BtnAdd } from "../components/ui/btnAdd";
 
-import { getRepositorieDataByName } from "../services/api";
+import { getRepositoryDataByName } from "../services/api";
 import { RepoList } from "../components/repoList";
+import { CenterPanel } from "../components/centerPanel";
 
 export const Home = () => {
 	const [newRepository, setNewRepository] = useState("");
@@ -39,16 +40,11 @@ export const Home = () => {
 					throw new Error("Você precisa digitar um repositório");
 				}
 
-				const data = await getRepositorieDataByName(newRepository);
+				const data = await getRepositoryDataByName(newRepository);
+
 				const checkIfIsDuplicated = repositories.find(
 					(repo) => repo === newRepository,
 				);
-
-				if (data.message === "Not Found") {
-					throw new Error(
-						"O repositório não foi encontrado, verifique se digitou corretamente",
-					);
-				}
 
 				if (checkIfIsDuplicated) {
 					throw new Error("Esse repositório já está na sua lista");
@@ -80,7 +76,7 @@ export const Home = () => {
 	};
 
 	return (
-		<div className="max-w-3xl mx-auto rounded-md p-5 bg-white">
+		<CenterPanel>
 			<div className="flex items-center gap-2 mb-5">
 				<Github className="w-8" />
 				<span className="text-xl font-bold">Meus repositórios</span>
@@ -107,6 +103,6 @@ export const Home = () => {
 			{error && <span className="text-red-600 font-bold">Erro: {error}</span>}
 
 			<RepoList repositories={repositories} handleDelete={handleDelete} />
-		</div>
+		</CenterPanel>
 	);
 };
