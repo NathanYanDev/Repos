@@ -1,3 +1,5 @@
+// Defines a `Repository` type with properties for the repository owner (including avatar and name),
+// repository name, full name, and description.
 export type Repository = {
 	owner: {
 		avatar: string;
@@ -8,11 +10,14 @@ export type Repository = {
 	description: string;
 };
 
-interface Label {
+// Defines a `Label` type with properties for the label's `id` (number) and `name` (string).
+type Label = {
 	id: number;
 	name: string;
-}
+};
 
+// Defines an `Issues` type with properties for the issue's `id`, user information (avatar and name),
+// link, title, and an array of labels.
 export type Issues = {
 	id: string;
 	user: {
@@ -24,6 +29,23 @@ export type Issues = {
 	labels: Label[];
 };
 
+// Defines an `IssueGit` type for api return data, with properties for the issue's `id`, user information (avatar URL and login),
+// HTML URL, title, and an array of labels.
+type IssueGit = {
+	id: number;
+	user: {
+		avatar_url: string;
+		login: string;
+	};
+	html_url: string;
+	title: string;
+	labels: Label[];
+};
+
+// Defines a `State` type that can be one of the following string values: "open", "closed", or "all".
+export type State = "open" | "closed" | "all";
+
+// Function to fetch repository data by repository name from GitHub API
 export const getRepositoryDataByName = async (
 	repositoryName: string,
 ): Promise<Repository> => {
@@ -57,13 +79,19 @@ export const getRepositoryDataByName = async (
 	}
 };
 
-export const getIssuesFromRepository = async (repositoryName: string) => {
+// Function to fetch repository issues by repository name from GitHub API
+export const getIssuesFromRepository = async (
+	repositoryName: string,
+	page: number,
+	state: State,
+) => {
 	try {
 		const response = await fetch(
 			`https://api.github.com/repos/${repositoryName}/issues?${new URLSearchParams(
 				{
 					per_page: "5",
-					state: "open",
+					page: String(page),
+					state: state,
 				},
 			).toString()}`,
 		);
@@ -74,8 +102,8 @@ export const getIssuesFromRepository = async (repositoryName: string) => {
 			throw new Error("Not Found");
 		}
 
-		const issues: Issues[] = data.map((issue) => ({
-			id: issue.id,
+		const issues: Issues[] = (data as IssueGit[]).map((issue: IssueGit) => ({
+			id: String(issue.id),
 			user: {
 				avatar: issue.user.avatar_url,
 				name: issue.user.login,

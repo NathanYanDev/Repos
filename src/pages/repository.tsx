@@ -1,23 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 
 import { CenterPanel } from "../components/centerPanel";
-import {
-	getIssuesFromRepository,
-	getRepositoryDataByName,
-} from "../services/api";
-import {
-	ArrowBigLeftIcon,
-	ArrowBigRightIcon,
-	ArrowLeftIcon,
-} from "lucide-react";
-import { useState } from "react";
+import { getRepositoryDataByName } from "../services/api";
+import { ArrowLeftIcon } from "lucide-react";
+import { Pagination } from "../components/pagination";
 
 export const Repository = () => {
 	const navigate = useNavigate();
-	const { repository } = useParams();
 
-	const [page, setPage] = useState(1);
+	const { repository } = useParams();
+	const [searchParams] = useSearchParams();
+
+	const page = searchParams.get("page") ? Number(searchParams.get("page")) : 1;
 
 	const { data: repoData, isLoading: loadingRepo } = useQuery({
 		queryKey: ["repoData"],
@@ -29,33 +24,7 @@ export const Repository = () => {
 		},
 	});
 
-	const { data: issuesData, isLoading: loadingIssues } = useQuery({
-		queryKey: ["issuesData"],
-		queryFn: () => {
-			if (repository) {
-				return getIssuesFromRepository(repository);
-			}
-			throw new Error("Repository is undefined");
-		},
-	});
-
-	const handlePage = (currentPage: string) => {
-		switch (currentPage) {
-			case "previous":
-				if (page === 1) {
-					break;
-				}
-				setPage(page - 1);
-				break;
-			case "next":
-				setPage(page + 1);
-				break;
-			default:
-				break;
-		}
-	};
-
-	if (loadingIssues || loadingRepo) {
+	if (loadingRepo) {
 		return null;
 	}
 
@@ -74,51 +43,7 @@ export const Repository = () => {
 				<p className="text-lg">{repoData?.description}</p>
 			</header>
 			<div>
-				<ul className="list-none mt-3 pt-3 border-t border-slate-400">
-					{issuesData?.map((issue) => (
-						<li
-							key={issue.id}
-							className="py-[15px] px-[10px] mb-3 flex gap-3 items-center"
-						>
-							<div>
-								<img
-									src={issue.user.avatar}
-									alt={issue.user.name}
-									className="w-[45px] h-[45px] rounded-[50%] border-2 border-slate-950"
-								/>
-							</div>
-							<div>
-								<a
-									href={issue.linkTo}
-									className="underline font-bold text-lg text-slate-900 hover:text-emerald-700"
-								>
-									{issue.title}
-								</a>
-
-								{issue.labels.map((label) => (
-									<span
-										key={label.id}
-										className="text-white bg-[#222] rounded text-xs py-1 px-2 ml-2"
-									>
-										{label.name}
-									</span>
-								))}
-
-								<p className="mt-2 text-xs text-black">{issue.user.name}</p>
-							</div>
-						</li>
-					))}
-				</ul>
-
-				<div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-400">
-					<button type="button" onClick={() => handlePage("previous")}>
-						<ArrowBigLeftIcon />
-					</button>
-
-					<button type="button" onClick={() => handlePage("next")}>
-						<ArrowBigRightIcon />
-					</button>
-				</div>
+				<Pagination page={page} />
 			</div>
 		</CenterPanel>
 	);

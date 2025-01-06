@@ -1,6 +1,7 @@
 import { MenuIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router";
 
+// Defines a type for the RepoListProps, which includes a list of repository names and a function to handle the deletion of a repository.
 type RepoListProps = {
 	repositories: string[];
 	handleDelete: (repository: string) => void;
@@ -22,7 +23,7 @@ export const RepoList = ({ repositories, handleDelete }: RepoListProps) => {
 								</button>
 								<span className="text-lg font-bold">{repository}</span>
 							</div>
-							<Link to={`/repository/${encodeURIComponent(repository)}`}>
+							<Link to={`/repository/${encodeURIComponent(repository)}?page=1`}>
 								<MenuIcon />
 							</Link>
 						</li>

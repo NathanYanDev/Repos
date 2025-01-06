@@ -1,19 +1,24 @@
+// Importing hooks
 import { useCallback, useEffect, useState } from "react";
 
-import { Github } from "../components/icons/github";
-import { BtnLoading } from "../components/ui/btnLoading";
+// Importing components
 import { BtnAdd } from "../components/ui/btnAdd";
-
-import { getRepositoryDataByName } from "../services/api";
+import { BtnLoading } from "../components/ui/btnLoading";
+import { Github } from "../components/icons/github";
 import { RepoList } from "../components/repoList";
 import { CenterPanel } from "../components/centerPanel";
 
+// Importing function from the api service to fetch data for a repository by its name.
+import { getRepositoryDataByName } from "../services/api";
+
 export const Home = () => {
+	// Creating states
 	const [newRepository, setNewRepository] = useState("");
 	const [repositories, setRepositories] = useState<string[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 
+	// Uses `useEffect` to retrieve and parse the stored repositories from `localStorage` when the component mounts, then sets the repositories state.
 	useEffect(() => {
 		const repositoriesStorage = localStorage.getItem("repos");
 
@@ -22,6 +27,7 @@ export const Home = () => {
 		}
 	}, []);
 
+	// Uses `useEffect` to store the `repositories` array in `localStorage` whenever the `repositories` state changes.
 	useEffect(() => {
 		if (repositories.length > 0) {
 			const repositoriesToString = JSON.stringify(repositories);
@@ -30,6 +36,12 @@ export const Home = () => {
 		}
 	}, [repositories]);
 
+	// Defines a `handleSubmit` function using `useCallback` to manage form submission.
+	// Validates the repository input and throws an error if empty.
+	// Fetches repository data using `getRepositoryDataByName`.
+	// Checks if the repository is already in the list to prevent duplicates.
+	// Updates the repository list and clears input and error states.
+	// Handles errors and loading state during the process.
 	const handleSubmit = useCallback(
 		async (ev: React.FormEvent) => {
 			ev.preventDefault();
@@ -65,12 +77,14 @@ export const Home = () => {
 		[newRepository, repositories],
 	);
 
+	// Defines a `handleDelete` function to remove a specified repository from the `repositories` list and update the state.
 	const handleDelete = (repository: string) => {
 		const newList = repositories.filter((r) => r !== repository);
 
 		setRepositories(newList);
 	};
 
+	// Defines a `handleInputChange` function to update the `newRepository` state with the value entered in the input field.
 	const handleInputChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
 		setNewRepository(ev.target.value);
 	};
